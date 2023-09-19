@@ -22,6 +22,7 @@ use alloc::string::String;
 use alloc::vec;
 #[cfg(not(feature = "std"))]
 use alloc::vec::Vec;
+#[cfg(feature = "std")]
 use log::debug;
 
 const BZ2_R_NUMS: [usize; 512] = [
@@ -188,6 +189,7 @@ impl BZip2DecoderBase {
                 };
             } else {
                 let data_block_crc = self.block_crc_digest.finish() as u32;
+                #[cfg(feature = "std")]
                 debug!(
                     " {{0x{:08x}, 0x{:08x}}}]",
                     self.block_crc, data_block_crc
@@ -220,6 +222,7 @@ impl BZip2DecoderBase {
                 let _ = Self::check_u8(reader, iter, 0x59)
                     .map_err(|_| BZip2Error::DataError)?;
                 self.block_no += 1;
+                #[cfg(feature = "std")]
                 debug!("    [{}: huff+mtf ", self.block_no);
 
                 self.block_crc = Self::read_u32(reader, iter)
@@ -463,6 +466,7 @@ impl BZip2DecoderBase {
                     return Err(BZip2Error::DataError);
                 }
 
+                #[cfg(feature = "std")]
                 debug!("rt+rld");
 
                 /*-- compute the T^(-1) vector --*/
@@ -500,6 +504,7 @@ impl BZip2DecoderBase {
                     .map_err(|_| BZip2Error::DataError)?;
                 let stored_combind_crc = Self::read_u32(reader, iter)
                     .map_err(|_| BZip2Error::UnexpectedEof)?;
+                #[cfg(feature = "std")]
                 debug!(
                     "    combined CRCs: stored = 0x{:08x}, computed = 0x{:08x}",
                     stored_combind_crc, self.combined_crc

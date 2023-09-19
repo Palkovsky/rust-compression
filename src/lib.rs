@@ -115,3 +115,4 @@ pub mod prelude {
     pub use crate::traits::decoder::{DecodeExt, DecodeIterator, Decoder};
     pub use crate::traits::encoder::{EncodeExt, EncodeIterator, Encoder};
 }
+

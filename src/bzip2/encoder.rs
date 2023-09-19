@@ -32,6 +32,7 @@ use alloc::string::String;
 use alloc::vec;
 #[cfg(not(feature = "std"))]
 use alloc::vec::Vec;
+#[cfg(feature = "std")]
 use log::{debug, log_enabled, Level};
 #[cfg(feature = "std")]
 use std::collections::vec_deque::VecDeque;
@@ -237,6 +238,7 @@ impl EncoderInner {
         self.combined_crc =
             ((self.combined_crc << 1) | (self.combined_crc >> 31)) ^ block_crc;
 
+        #[cfg(feature = "std")]
         debug!(
             "    block {}: crc = 0x{:08X}, combined CRC = 0x{:08X}, size = {}",
             self.block_no, block_crc, self.combined_crc, nblock
@@ -285,6 +287,7 @@ impl EncoderInner {
             self.write_u8(queue, 0x90);
             let comcrc = self.combined_crc;
             self.write_u32(queue, comcrc);
+            #[cfg(feature = "std")]
             debug!("    final combined CRC = 0x{:08X}   ", self.combined_crc);
         }
         Ok(())
@@ -357,6 +360,7 @@ impl EncoderInner {
         mtf_count += 1;
         mtf_freq[eob] += 1;
 
+        #[cfg(feature = "std")]
         debug!(
             "      {} in block, {} after MTF & 1-2 coding, {}+2 syms in use",
             self.block_buf.len(),
@@ -398,6 +402,7 @@ impl EncoderInner {
                     ge -= 1;
                 }
 
+                #[cfg(feature = "std")]
                 debug!(
                     "      initial group {}, [{} .. {}], has {} syms ({:4.1}%)",
                     n_part,
@@ -480,6 +485,7 @@ impl EncoderInner {
                 gs = ge;
             }
 
+            #[cfg(feature = "std")]
             if log_enabled!(Level::Debug) {
                 let mut debug_str = String::new();
 
@@ -553,6 +559,7 @@ impl EncoderInner {
                 }
             }
 
+            #[cfg(feature = "std")]
             if log_enabled!(Level::Debug) {
                 let _ = fmt::write(
                     &mut debug_str,
@@ -573,6 +580,7 @@ impl EncoderInner {
             self.write(queue, SmallBitVec::new((1 << (s + 1)) - 2, s + 1));
         }
 
+        #[cfg(feature = "std")]
         if log_enabled!(Level::Debug) {
             let _ = fmt::write(
                 &mut debug_str,
@@ -599,6 +607,8 @@ impl EncoderInner {
                 self.write(queue, SmallBitVec::new(0, 1));
             }
         }
+
+        #[cfg(feature = "std")]
         if log_enabled!(Level::Debug) {
             let _ = fmt::write(
                 &mut debug_str,
@@ -627,6 +637,8 @@ impl EncoderInner {
                 sel_ctr += 1;
             }
         }
+
+        #[cfg(feature = "std")]
         if log_enabled!(Level::Debug) {
             let _ = fmt::write(
                 &mut debug_str,
